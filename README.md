@@ -39,6 +39,8 @@ hosted version.
 ![RepoDoctor repository health analysis](docs/images/repodoctor-report.png)
 ## How the score works
 
+[Detailed scoring documentation](docs/scoring.md)
+
 | Criterion | Maximum points |
 | --- | ---: |
 | README | 20 |
