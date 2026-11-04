@@ -1,0 +1,38 @@
+name: Bug report
+description: Report a problem with RepoDoctor
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug.
+        Do not share tokens or sensitive information.
+  - type: input
+    id: repository
+    attributes:
+      label: Repository being analyzed
+      description: Optional public repository name
+      placeholder: owner/repository
+    validations:
+      required: false
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Explain how to reproduce the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should have happened?
+    validations:
+      required: true
