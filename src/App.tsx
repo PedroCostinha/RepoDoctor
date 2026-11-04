@@ -1,7 +1,12 @@
-﻿import { useState, type FormEvent } from 'react'
+﻿import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import './App.css'
 import { inspectRepository, type Inspection } from './services/githubAnalysis'
 import { getRecommendations } from './analysis/recommendations'
+import {
+  normalizeRepository,
+  getSharedRepository,
+  createShareUrl,
+} from './services/share'
 
 type Repository = {
   full_name: string
@@ -21,42 +26,20 @@ type Repository = {
 
 type ReadmeStatus = 'found' | 'missing' | 'unknown'
 
-function parseRepository(value: string): string | null {
-  const cleaned = value
-    .trim()
-    .replace(/\/+$/, '')
-    .replace(/^https?:\/\/(?:www\.)?github\.com\//i, '')
-
-  const match = cleaned.match(
-    /^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,38}))\/([a-zA-Z0-9._-]+)$/
-  )
-
-  if (!match || match[2] === '.' || match[2] === '..') {
-    return null
-  }
-
-  return `${match[1]}/${match[2]}`
-}
-
 function App() {
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState(
+    () => getSharedRepository(window.location.search) ?? ''
+  )
   const [repository, setRepository] = useState<Repository | null>(null)
   const [readme, setReadme] = useState<ReadmeStatus>('unknown')
   const [inspection, setInspection] = useState<Inspection | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [shareFeedback, setShareFeedback] = useState('')
 
-  async function analyze(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    const name = parseRepository(input)
-
-    if (!name) {
-      setError('Informe uma URL valida ou usuario/repositorio.')
-      return
-    }
-
+  const analyzeRepository = useCallback(async (name: string) => {
     setLoading(true)
+    setShareFeedback('')
     setError('')
     setRepository(null)
     setReadme('unknown')
@@ -112,6 +95,51 @@ function App() {
       )
     } finally {
       setLoading(false)
+    }
+  }, [])
+
+  function analyze(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const name = normalizeRepository(input)
+
+    if (!name) {
+      setError('Informe uma URL valida ou usuario/repositorio.')
+      return
+    }
+
+    void analyzeRepository(name)
+  }
+
+  useEffect(() => {
+    const shared = getSharedRepository(window.location.search)
+
+    if (!shared) return
+
+    const timer = window.setTimeout(() => {
+      void analyzeRepository(shared)
+    }, 0)
+
+    return () => window.clearTimeout(timer)
+  }, [analyzeRepository])
+
+  async function shareReport() {
+    if (!repository || !inspection) return
+
+    const url = createShareUrl(
+      repository.full_name,
+      window.location.href,
+    )
+
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareFeedback(
+        'Link copiado! A analise sera atualizada quando for aberta.'
+      )
+    } catch {
+      setShareFeedback(
+        `Nao foi possivel copiar automaticamente. Copie o link: ${url}`
+      )
     }
   }
 
@@ -186,15 +214,33 @@ function App() {
                 </p>
               </div>
 
-              <a
-                href={repository.html_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="repo-link"
-              >
-                Ver no GitHub
-              </a>
+              <div className="report-actions">
+                <a
+                  href={repository.html_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="repo-link"
+                >
+                  Ver no GitHub
+                </a>
+
+                {inspection && (
+                  <button
+                    type="button"
+                    className="share-button"
+                    onClick={() => void shareReport()}
+                  >
+                    Copiar link da analise
+                  </button>
+                )}
+              </div>
             </div>
+
+            {shareFeedback && (
+              <p className="share-feedback" role="status">
+                {shareFeedback}
+              </p>
+            )}
 
             <div className="stats">
               <div className="stat">
