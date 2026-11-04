@@ -1,6 +1,7 @@
 ﻿import { useState, type FormEvent } from 'react'
 import './App.css'
 import { inspectRepository, type Inspection } from './services/githubAnalysis'
+import { getRecommendations } from './analysis/recommendations'
 
 type Repository = {
   full_name: string
@@ -113,6 +114,10 @@ function App() {
       setLoading(false)
     }
   }
+
+  const recommendations = inspection
+    ? getRecommendations(inspection.analysis.checks)
+    : []
 
   return (
     <div className="app">
@@ -295,6 +300,43 @@ function App() {
                     </div>
                   ))}
                 </div>
+
+                {recommendations.length > 0 && (
+                  <section
+                    className="recommendations"
+                    aria-label="Recomendacoes para melhorar o repositorio"
+                  >
+                    <h3>Como melhorar</h3>
+                    <p className="recommendations-intro">
+                      Acoes sugeridas para os criterios nao identificados,
+                      organizadas pela maior pontuacao.
+                    </p>
+
+                    <div className="recommendations-list">
+                      {recommendations.map((recommendation) => (
+                        <article
+                          className="recommendation-item"
+                          key={recommendation.id}
+                        >
+                          <div className="recommendation-title">
+                            <h4>{recommendation.title}</h4>
+                            <span>+{recommendation.points} pts</span>
+                          </div>
+
+                          <p>{recommendation.description}</p>
+
+                          <a
+                            href={recommendation.docsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Ver documentacao oficial
+                          </a>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </section>
             )}
 
