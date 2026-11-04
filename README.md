@@ -34,6 +34,9 @@ hosted version.
 - **Responsive interface:** use RepoDoctor on desktop or mobile.
 - **Public GitHub API:** inspect repositories without authentication.
 
+## Preview
+
+![RepoDoctor repository health analysis](docs/images/repodoctor-report.png)
 ## How the score works
 
 | Criterion | Maximum points |
