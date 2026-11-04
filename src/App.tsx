@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+﻿import { useState, type FormEvent } from 'react'
 import './App.css'
 import { inspectRepository, type Inspection } from './services/githubAnalysis'
 
@@ -299,9 +299,8 @@ function App() {
             )}
 
             <p className="disclaimer">
-              Esta e a primeira etapa do RepoDoctor.
-              A pontuacao de qualidade sera adicionada quando
-              o motor de regras estiver implementado e testado.
+              A analise verifica a presenca de boas praticas publicas.
+              A pontuacao nao garante seguranca ou qualidade do codigo.
             </p>
           </section>
         )}

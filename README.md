@@ -24,6 +24,7 @@ Open the local address shown by Vite.
 
 ## Quality checks
 
+    npm run test
     npm run build
     npm run lint
 
@@ -39,11 +40,11 @@ Open the local address shown by Vite.
 - [x] Initial interface
 - [x] Public repository lookup
 - [x] Basic GitHub API integration
-- [ ] Repository health scoring
-- [ ] Automated tests
+- [x] Repository health scoring
+- [x] Automated tests
 - [ ] Portuguese and English translations
 - [ ] Shareable reports
-- [ ] GitHub Pages publication
+- [x] GitHub Pages publication
 
 ## Limitations
 
